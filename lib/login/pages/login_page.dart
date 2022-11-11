@@ -38,8 +38,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-
-    //Inicializa o objeto do controlador
   }
 
   @override
@@ -66,16 +64,7 @@ class _LoginPageState extends State<LoginPage> {
               icon: Icons.email,
               hint: "Informe seu e-mail",
               onChanged: (emailDigitado) {
-                bool state = loginController.setEmail(emailDigitado);
-
-                setState(() {
-                  loginController.btnIsValid = state;
-
-                  /* Retira a mensagem: "E-mail e/ou Senha inválidos" */
-                  if (loginController.failOnLogin) {
-                    loginController.failOnLogin = false;
-                  }
-                });
+                loginController.setEmail(emailDigitado);
               },
               validator: (email) {
                 if (email == null || email.isEmpty) {
@@ -110,15 +99,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               hint: "Informe sua senha",
               onChanged: (senhaDigitada) {
-                bool state = loginController.setPassword(senhaDigitada);
-                setState(() {
-                  loginController.btnIsValid = state;
-
-                  /* Retira a mensagem: "E-mail e/ou Senha inválidos" */
-                  if (loginController.failOnLogin) {
-                    loginController.failOnLogin = false;
-                  }
-                });
+                loginController.setPassword(senhaDigitada);
               },
               validator: (senha) {
                 if (senha == null || senha.isEmpty) {
@@ -132,33 +113,38 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
             const SizedBox(height: 10),
-
-            loginController.failOnLogin
-                ? Column(
-                    children: const [
-                      SimpleTextWidget(
-                          textoRecebido: "E-mail e/ou Senha inválidos",
-                          textSize: 15,
-                          textColor: Colors.red),
-                      SizedBox(height: 10),
-                    ],
-                  )
-                : const SizedBox(),
-
-            ButtonWidget(
-                textButton: "Acessar",
-                colorButton: const Color.fromARGB(255, 132, 213, 55),
-                onPressed: loginController.btnIsValid
-                    ? () {
-                        bool loginIsOk = loginController.login(context);
-
-                        setState(() {
-                          loginIsOk
-                              ? loginController.failOnLogin = false
-                              : loginController.failOnLogin = true;
-                        });
-                      }
-                    : null) //Quando null, o botão fica desabilitado
+            /* Responsável por reconstruir esse fragmento na tela, ao sofrer alguma alteração*/
+            ValueListenableBuilder(
+              valueListenable: loginController.$failOnLogin,
+              builder: (_, __, ___) {
+                return loginController
+                        .failOnLogin //testa com o get do controller
+                    ? Column(
+                        children: const [
+                          SimpleTextWidget(
+                              textoRecebido: "E-mail e/ou Senha inválidos",
+                              textSize: 18,
+                              textColor: Color.fromARGB(255, 208, 27, 14)),
+                          SizedBox(height: 10),
+                        ],
+                      )
+                    : const SizedBox();
+              },
+            ),
+            ValueListenableBuilder(
+              valueListenable: loginController.$btnIsValid,
+              builder: (_, __, ___) {
+                return ButtonWidget(
+                    textButton: "Acessar",
+                    colorButton: const Color.fromARGB(255, 132, 213, 55),
+                    onPressed:
+                        loginController.btnIsValid //Pega o get do controller
+                            ? () {
+                                loginController.login(context);
+                              }
+                            : null);
+              },
+            ),
           ],
         ),
       ),
