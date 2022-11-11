@@ -1,4 +1,7 @@
-import 'package:cadastro_e_login/cadastro/pages/cadastro_page.dart';
+import 'package:cadastro_e_login/login/controllers/login_controller.dart';
+import 'package:cadastro_e_login/login/models/login_model.dart';
+import 'package:cadastro_e_login/login/pages/login_page.dart';
+import 'package:cadastro_e_login/login/repositories/login_repository.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +18,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
-      home: const CadastroPage(tituloPagina: "Faça seu cadastro"),
+      home: LoginPage(
+        tituloPagina: "Login",
+        loginController: LoginController(
+          LoginRepository(
+            LoginModel(),
+          ),
+        ),
+      ),
     );
   }
 }

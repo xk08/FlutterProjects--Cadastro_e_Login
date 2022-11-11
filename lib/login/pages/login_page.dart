@@ -1,40 +1,45 @@
-// ignore_for_file: avoid_print
-
-import 'package:cadastro_e_login/cadastro/controllers/cadastro_controller.dart';
+// ignore_for_file: avoid_print, no_logic_in_create_state
+import 'package:cadastro_e_login/login/controllers/login_controller.dart';
 import 'package:cadastro_e_login/shared/widgets/button_widget.dart';
 import 'package:cadastro_e_login/shared/widgets/simple_text_widget.dart';
 import 'package:cadastro_e_login/shared/widgets/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
 
-class CadastroPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final String tituloPagina;
-  const CadastroPage({super.key, required this.tituloPagina});
+  final LoginController loginController;
+
+  const LoginPage({
+    super.key,
+    required this.tituloPagina,
+    required this.loginController,
+  });
 
   @override
-  // ignore: no_logic_in_create_state
   // ignore: todo
   //TODO: Verificar o motivo da recomendação...
-  // ignore: no_logic_in_create_state
-  State<CadastroPage> createState() => _CadastroPageState(tituloPagina);
+  State<LoginPage> createState() => _LoginPageState(
+        tituloPagina,
+        loginController,
+      );
 }
 
-class _CadastroPageState extends State<CadastroPage> {
+class _LoginPageState extends State<LoginPage> {
   //Declara porém, inicia no initState da página
-  late CadastroController cadastroController;
-
+  final LoginController loginController;
   final String tituloPagina;
 
   bool obsecureTextPassword = true;
-  bool botaoEValido = true;
-
-  _CadastroPageState(this.tituloPagina);
+  _LoginPageState(
+    this.tituloPagina,
+    this.loginController,
+  );
 
   @override
   void initState() {
     super.initState();
 
     //Inicializa o objeto do controlador
-    cadastroController = const CadastroController();
   }
 
   @override
@@ -51,8 +56,7 @@ class _CadastroPageState extends State<CadastroPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SimpleTextWidget(
-                textoRecebido: "Informe seus dados", textSize: 30),
+            const SimpleTextWidget(textoRecebido: "Seus dados", textSize: 30),
             const SizedBox(height: 30),
             TextFormFieldWidget(
               enabled: true,
@@ -62,12 +66,26 @@ class _CadastroPageState extends State<CadastroPage> {
               icon: Icons.email,
               hint: "Informe seu e-mail",
               onChanged: (emailDigitado) {
-                print("Email: $emailDigitado");
+                bool state = loginController.setEmail(emailDigitado);
+
+                setState(() {
+                  loginController.btnIsValid = state;
+
+                  /* Retira a mensagem: "E-mail e/ou Senha inválidos" */
+                  if (loginController.failOnLogin) {
+                    loginController.failOnLogin = false;
+                  }
+                });
               },
               validator: (email) {
                 if (email == null || email.isEmpty) {
                   return "O e-mail é obrigatório";
                 }
+
+                if (!loginController.emailValidRegexp) {
+                  return "O e-mail não é de um tipo válido";
+                }
+
                 return null;
               },
             ),
@@ -92,23 +110,53 @@ class _CadastroPageState extends State<CadastroPage> {
               ),
               hint: "Informe sua senha",
               onChanged: (senhaDigitada) {
-                print("Senha: $senhaDigitada");
+                bool state = loginController.setPassword(senhaDigitada);
+                setState(() {
+                  loginController.btnIsValid = state;
+
+                  /* Retira a mensagem: "E-mail e/ou Senha inválidos" */
+                  if (loginController.failOnLogin) {
+                    loginController.failOnLogin = false;
+                  }
+                });
               },
               validator: (senha) {
                 if (senha == null || senha.isEmpty) {
                   return "A senha é obrigatória";
                 }
+
+                if (senha.toString().length < 6) {
+                  return "A senha deve ter ao menos 6 caracteres";
+                }
                 return null;
               },
             ),
             const SizedBox(height: 10),
+
+            loginController.failOnLogin
+                ? Column(
+                    children: const [
+                      SimpleTextWidget(
+                          textoRecebido: "E-mail e/ou Senha inválidos",
+                          textSize: 15,
+                          textColor: Colors.red),
+                      SizedBox(height: 10),
+                    ],
+                  )
+                : const SizedBox(),
+
             ButtonWidget(
-                textButton: "Criar cadastro",
+                textButton: "Acessar",
                 colorButton: const Color.fromARGB(255, 132, 213, 55),
-                onPressed: botaoEValido
+                onPressed: loginController.btnIsValid
                     ? () {
-                        print("Teste");
-                        cadastroController.teste();
+                        bool loginIsOk = loginController.login(context);
+
+                        setState(() {
+                          loginIsOk
+                              ? loginController.failOnLogin = false
+                              : loginController.failOnLogin = true;
+                        });
                       }
                     : null) //Quando null, o botão fica desabilitado
           ],
