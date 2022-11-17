@@ -1,6 +1,13 @@
 class SignUpModel {
-  String nome;
+  String name;
+  String? lastName;
+  String email;
+  String password;
+
   SignUpModel({
-    this.nome = "",
+    this.name = "",
+    this.email = "",
+    this.password = "",
+    this.lastName,
   });
 }
