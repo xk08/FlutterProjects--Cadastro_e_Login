@@ -145,6 +145,14 @@ class _LoginPageState extends State<LoginPage> {
                             : null);
               },
             ),
+            const SizedBox(height: 50),
+            SimpleTextWidget(
+              textSize: 18,
+              textoRecebido: "Clique para criar conta",
+              onSimpleTap: () {
+                loginController.goToSignUpPage(context);
+              },
+            ),
           ],
         ),
       ),

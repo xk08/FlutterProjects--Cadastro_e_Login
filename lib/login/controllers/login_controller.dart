@@ -2,6 +2,10 @@
 import 'package:cadastro_e_login/home/pages/home_page.dart';
 import 'package:cadastro_e_login/login/models/login_model.dart';
 import 'package:cadastro_e_login/login/repositories/login_repository.dart';
+import 'package:cadastro_e_login/signup/controllers/signup_controller.dart';
+import 'package:cadastro_e_login/signup/models/signup_model.dart';
+import 'package:cadastro_e_login/signup/pages/signup_page.dart';
+import 'package:cadastro_e_login/signup/repositories/signup_repository.dart';
 import 'package:flutter/material.dart';
 
 class LoginController {
@@ -89,5 +93,21 @@ class LoginController {
       //Exibe mensagem na tela (em cima do botão de salvar)
       setFailOnLogin = true;
     }
+  }
+
+  goToSignUpPage(BuildContext context) {
+    //Direciona para a tela de Login (Sobre-escreve a rota principal (login) pela nova rota)
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SignUpPage(
+          signUpController: SignUpController(
+            SignUpRepository(
+              SignUpModel(),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
