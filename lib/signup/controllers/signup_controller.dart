@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cadastro_e_login/login/controllers/login_controller.dart';
 import 'package:cadastro_e_login/login/models/login_model.dart';
 import 'package:cadastro_e_login/login/pages/login_page.dart';
 import 'package:cadastro_e_login/login/repositories/login_repository.dart';
+import 'package:cadastro_e_login/signup/models/signup_model.dart';
 import 'package:cadastro_e_login/signup/repositories/signup_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -101,8 +104,23 @@ class SignUpController {
   }
 
   //Função responsável pelo cadastro do usuário no Armazenamento local da aplicação
-  signUp(BuildContext context) {
-    print("Clicou aqui...");
+  signUp(BuildContext context) async {
+    //Instanciando um novo objeto e o completando
+    SignUpModel signUpModel = SignUpModel();
+    signUpModel.name = name;
+    signUpModel.lastName = lastName;
+    signUpModel.email = email;
+    signUpModel.password = password;
+
+    //Chama o repository que faz a interação com o Armazenamento Local
+    bool signUpResult = await signUpRepository.signUp(signUpModel);
+
+    if (signUpResult) {
+      //Sucesso ao criar, direciona para o Login
+      goToLoginPage(context);
+    } else {
+      //Algum erro ao criar o cadastro
+    }
   }
 
   goToLoginPage(BuildContext context) {
