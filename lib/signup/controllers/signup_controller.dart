@@ -122,7 +122,7 @@ class SignUpController {
     signUpModel.email = email;
     signUpModel.password = password;
 
-    //Chama o repository que faz a interação com o Armazenamento Local
+    //Chama o repository que faz a interação com o Armazenamento Local (SharedPreferences)
     bool signUpResult = await signUpRepository.signUp(signUpModel);
 
     if (signUpResult) {

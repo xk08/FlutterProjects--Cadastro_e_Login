@@ -75,21 +75,23 @@ class LoginController {
         : setBtnIsValid = false;
   }
 
-  login(BuildContext context) {
-    //Pega as informações do objeto de login no Repository que vem do Armazenamento local do celular
-    LoginModel loginDataObject = loginRepository.loginRepository();
+  Future login(BuildContext context) async {
+    //Instância e preenche o objeto de login para mandar ao repository
+    LoginModel loginModel = LoginModel();
+    loginModel.email = email;
+    loginModel.password = password;
 
-    if (email == loginDataObject.email &&
-        password == loginDataObject.password) {
+    //Pega as informações do objeto de login no Repository que vem do Armazenamento local do celular
+    bool loginIsValid = await loginRepository.loginRepository(loginModel);
+
+    if (loginIsValid) {
       //Caso obtenha sucesso no login...
       setFailOnLogin = false;
-
       //Direciona para a tela de Login (Sobre-escreve a rota principal (login) pela nova rota)
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const HomePage()));
     } else {
-      print("E-mail e/ou Senha inválidos....");
-
       //Exibe mensagem na tela (em cima do botão de salvar)
       setFailOnLogin = true;
     }
