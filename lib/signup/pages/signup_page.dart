@@ -119,6 +119,18 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
+                ValueListenableBuilder(
+                  valueListenable: signUpController.$emailIsValidMessage,
+                  builder: (_, __, ___) {
+                    return !signUpController.emailIsValidMessage
+                        ? const SimpleTextWidget(
+                            textoRecebido: "Este e-mail já foi cadastrado!",
+                            textSize: 15,
+                            textColor: Color.fromARGB(255, 192, 31, 19),
+                          )
+                        : const SizedBox();
+                  },
+                ),
                 const SizedBox(height: 30),
                 /* SENHA */
                 TextFormFieldWidget(

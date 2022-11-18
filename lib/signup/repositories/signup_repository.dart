@@ -5,8 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 /* Fica faltando (Cadastro):
-  -> Organizar este arquivo
-  -> Mostrar a mensagem na tela (que o email já existe!)
   -> Testar tudo novamente!
 
   Fica faltando (Login)
@@ -30,42 +28,45 @@ class SignUpRepository {
     if (prefs.getStringList("users") != null) {
       //Busca a lista de usuários
       userList = prefs.getStringList("users")!;
-
-      //Se a lista não for vazia...
       //Percorre os elementos da lista
+      // ignore: todo
       for (var usr in userList) {
+        // ignore: todo
+        //TODO: No futuro pode ser trocado por alguma função de Find que não utilize Looping
         Map<String, dynamic> valueMap = json.decode(usr);
         SignUpModel userModel = SignUpModel.fromJson(valueMap);
         //Verifica se o email já existe no Shared Preferences
         if (userModel.email == signUpModelReceived.email) {
           //O usuário já existe!
           userExists = true;
-          break; //Ao encontrar um usuário, sai do laço de repetição
+          break; //Ao encontrar um usuário com o email informado, sai do laço de repetição
         } else {
           userExists = false;
         }
       }
 
       if (!userExists) {
+        //Se o usuário não existir
         try {
           var encodedString = jsonEncode(signUpModelReceived);
           userList.add(encodedString); //Adiciona o novo usuário na lista
           prefs.setStringList("users", userList);
+          return true;
         } catch (e) {
-          print("Ocorreu o seguint erro: $e");
+          print("Ocorreu o seguinte erro: $e");
+          return false;
         }
       } else {
-        //O usuário já existe no sistema! - Apresentar mensagem
-        print("O usuário já existe");
+        //Este email já foi cadastrado
+        return false;
       }
     } else {
-      //A lista é nulla/vazia, ainda não foi salvo nenhum registro
+      //A lista é nulla/vazia e ainda não foi salvo nenhum registro
       var encodedString = jsonEncode(signUpModelReceived);
       userList
           .add(encodedString); //Adiciona o primeiro elemento/usuário na lista
       prefs.setStringList("users", userList);
+      return true;
     }
-
-    return true; //Trocar!!
   }
 }

@@ -33,6 +33,13 @@ class SignUpController {
       .value; //Usado na view, para não ter que chamar sempre o .value
   set setBtnIsValid(bool captured) => $btnIsValid.value = captured;
 
+  //****** Controlando a reatividade com o ValueNotifier *******
+  //Email
+  ValueNotifier<bool> $emailIsValidMessage = ValueNotifier(true);
+  bool get emailIsValidMessage => $emailIsValidMessage.value;
+  set setEmailIsValidMessage(bool captured) =>
+      $emailIsValidMessage.value = captured;
+
   /* NAME */
   setName(nameReceived) {
     name = nameReceived;
@@ -77,6 +84,9 @@ class SignUpController {
 
     emailValidRegexp ? emailIsValid = true : emailIsValid = false;
 
+    //Retira a mensagem automática de "Este e-mail já foi cadastrado!"
+    !emailIsValidMessage ? setEmailIsValidMessage = true : null;
+
     //Chama a validação geral, que controla o acesso ao botão
     validaSignUp();
   }
@@ -117,9 +127,10 @@ class SignUpController {
 
     if (signUpResult) {
       //Sucesso ao criar, direciona para o Login
+      setEmailIsValidMessage = signUpResult;
       goToLoginPage(context);
     } else {
-      //Algum erro ao criar o cadastro
+      setEmailIsValidMessage = signUpResult;
     }
   }
 
